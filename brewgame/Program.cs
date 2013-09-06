@@ -21,7 +21,7 @@ namespace BrewGame
             locations.Add(new Location("Testville, USA", new int[] { 5, 5 }));
 
             Console.WriteLine("\nEnter your company name.");
-            company = new Company(Console.ReadLine(), 1000);
+            company = new Company(Console.ReadLine(), 1200);
             
             // Start main loop
             MainLoop();
@@ -60,6 +60,7 @@ namespace BrewGame
                         break;
                     case 1:
                         // buy recipe
+                        BuyRecipe();
                         break;
                     case 2:
                         // buy ingredients
@@ -152,6 +153,49 @@ namespace BrewGame
             else
             {
                 return idx;
+            }
+        }
+
+
+        // ----- BuyRecipe --------------------------------
+        //
+        // Buy a recipe for a company
+        //
+        // ------------------------------------------------
+        public static void BuyRecipe()
+        {
+            // Variable declaration
+            List<Recipe> recipeList = Recipe.GetAllRecipes();
+            int recipeIdx;
+            Recipe selected;
+
+            // List available recipes
+            for (int i = 0; i < recipeList.Count; i++)
+            {
+                Console.WriteLine("{0}) ${2} | {1}",
+                    i + 1,
+                    recipeList[i].nm,
+                    recipeList[i].GetCost());
+            }
+
+            // Prompt for user input
+            recipeIdx = GetUserInput(recipeList.Count);
+            if (recipeIdx == -1) return;
+            selected = recipeList[recipeIdx];
+
+            // Charge the company's cash and add the recipe
+            if (!company.Charge(selected.GetCost()))
+            {
+                Console.WriteLine("Insufficient funds.");
+                Console.ReadKey();
+                return;
+            }
+            else
+            {
+                company.recipes.Add(selected);
+                Console.WriteLine("Purchased \"{0}\" recipe.",
+                    selected.nm);
+                Console.ReadKey();
             }
         }
 
@@ -501,6 +545,28 @@ namespace BrewGame
         public int time { get; private set; }
         public Brew output { get; private set; }
         public int brewQty { get; private set; }
+
+        
+        // ----- GetAllRecipes ----------------------------
+        //
+        // ------------------------------------------------
+        public static List<Recipe> GetAllRecipes()
+        {
+            List<Recipe> list = new List<Recipe>();
+            list.Add(new Recipe("american lager"));
+
+
+            return list;
+        }
+
+        // ----- GetCost ----------------------------------
+        //
+        // ------------------------------------------------
+        public int GetCost()
+        {
+            return 500; // TODO - Make this dynamic
+        }
+
     }
 
     public class FermVessel
